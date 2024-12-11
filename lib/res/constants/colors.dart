@@ -14,6 +14,9 @@ class AppColor {
   static const dashgreen = Color(0xFF009684);
   static const dashappbar = Color(0xFF1DC4E9);
   static const dashgrey = Color(0xFFEEF5F9);
+  static const customorange = Color(0xFFFFB22B);
+  
+
 
 
 }

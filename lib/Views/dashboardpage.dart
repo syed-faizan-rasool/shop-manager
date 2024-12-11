@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shop_manager/Views/customerPage.dart';
 import 'package:shop_manager/res/components/card.dart';
 import 'package:shop_manager/res/constants/colors.dart';
 
@@ -221,8 +222,7 @@ Widget _buildExpandableDrawerItem(String title, List<String> subItems) {
       style: GoogleFonts.poppins(
         fontSize: 16,
         color: AppColor.customgrey,
-            fontWeight: FontWeight.w700
-
+        fontWeight: FontWeight.w700,
       ),
     ),
     children: subItems.map((item) {
@@ -233,12 +233,19 @@ Widget _buildExpandableDrawerItem(String title, List<String> subItems) {
           style: GoogleFonts.poppins(
             fontSize: 14,
             color: AppColor.customgrey,
-            fontWeight: FontWeight.w700
+            fontWeight: FontWeight.w700,
           ),
         ),
         onTap: () {
-          // Handle tap action for sub-items
-          debugPrint('$title - $item tapped');
+          if (item == "Customers") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) =>  CustomerScreen()),
+            );
+          } else {
+            // Handle other items as needed
+            debugPrint('$title - $item tapped');
+          }
         },
       );
     }).toList(),
