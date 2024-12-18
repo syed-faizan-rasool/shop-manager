@@ -67,6 +67,24 @@ class CustomerScreen extends StatefulWidget {
 }
 
 class _CustomerScreenState extends State<CustomerScreen> {
+
+void deleteCustomer(CustomerData customer) async {
+  try {
+    await _db.deleteCustomer(customer.Id); 
+    setState(() {
+      customers.remove(customer);
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('${customer.name} deleted successfully')),
+    );
+  } catch (error) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error deleting customer: $error')),
+    );
+  }
+}
+
+
   List<Customer> customers = [];
   List<EditCustomer> editcustomers = [];
 
@@ -107,7 +125,9 @@ class _CustomerScreenState extends State<CustomerScreen> {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.arrow_back, color: AppColor.white),
+            InkWell(
+             onTap:  () => Navigator.pop(context),
+              child: const Icon(Icons.arrow_back, color: AppColor.white)),
             const SizedBox(width: 20),
             Text(
               "Customers",
@@ -326,16 +346,17 @@ Row(
             child: EditCustomerPage(
               editcustomer: selectedCustomer,
               onUpdate: (updatedCustomer) {
-              
+
                 setState(() {
      
       int index = customers.indexOf(selectedCustomer);
       if (index != -1) {
-        customers[index] = updatedCustomer as CustomerData;
+        customers[index] = updatedCustomer as CustomerData ;
       }
     });
                 Navigator.pop(context); 
               },
+              Id: selectedCustomer.Id,
             ),
           ),
         );
@@ -523,13 +544,34 @@ Row(
   ],
 ),
 
-SizedBox(
+const SizedBox(
   height: 15,
 ),
 
 InkWell(
   onTap: () {
-
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Customer'),
+          content: Text('Are you sure you want to delete ${customer.name}?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context), // Close the dialog
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                deleteCustomer(customer); // Call the delete function
+                Navigator.pop(context); // Close the dialog after deletion
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
   },
   child: Center(
     child: Container(
@@ -537,14 +579,16 @@ InkWell(
       width: 40,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(4),
-  
-        color:AppColor.dashappbar
-  
+        color: AppColor.dashappbar,
       ),
-            child:Icon(Icons.delete_forever_outlined,color: AppColor.dashred,),
+      child: const Icon(
+        Icons.delete_forever_outlined,
+        color: AppColor.dashred,
       ),
+    ),
   ),
 ),
+
 
 
           ],

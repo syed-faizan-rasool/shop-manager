@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shop_manager/Views/Customres/customerPage.dart';
+import 'package:shop_manager/Views/Profile/profilepage.dart';
 import 'package:shop_manager/res/components/card.dart';
 import 'package:shop_manager/res/commons/colors.dart';
 
@@ -242,7 +243,13 @@ Widget _buildExpandableDrawerItem(String title, List<String> subItems) {
               context,
               MaterialPageRoute(builder: (context) =>  const CustomerScreen()),
             );
-          } else {
+          } else  if (item == "Profile") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) =>  const ProfilePage()),
+            );
+          }
+           else {
             // Handle other items as needed
             debugPrint('$title - $item tapped');
           }

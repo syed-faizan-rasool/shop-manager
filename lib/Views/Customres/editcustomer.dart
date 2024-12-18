@@ -9,12 +9,13 @@ import 'package:shop_manager/res/commons/colors.dart';
 
 class EditCustomerPage extends StatefulWidget {
   final Function(EditCustomer) onUpdate;
-  final CustomerData editcustomer; // Add this to accept the customer data
+  final CustomerData editcustomer; 
+  final int Id;
 
-  const EditCustomerPage({
+   const EditCustomerPage({
     super.key,
     required this.onUpdate,
-    required this.editcustomer, // Make customer data required
+    required this.editcustomer, required this.Id, // Make customer data required
   });
 
   @override
@@ -62,6 +63,9 @@ class _EditCustomerPageState extends State<EditCustomerPage> {
   List<String> bstatus = ['Select Balance Status', 'Receiveable', 'Payable'];
 
   String selectedCountryCode = '+92';
+
+
+
 
 
   late AppDb _db;
@@ -146,7 +150,7 @@ _nameController.text = widget.editcustomer.name;
   items: types.map((String type) {
     return DropdownMenuItem<String>(
       value: type,
-      child: Text(type,   style: GoogleFonts.poppins(
+      child: Text(type,   style: GoogleFonts.poppins(  
                   fontSize: 16,
                   color:  AppColor.customgrey,
                   fontWeight: FontWeight.w400,
@@ -337,7 +341,7 @@ _nameController.text = widget.editcustomer.name;
         return;
       }
 
-      // Validate Due Date
+
       if (_dueDateController.text.isEmpty) {
         print("Error: Due date cannot be empty");
         return;
@@ -366,6 +370,7 @@ _nameController.text = widget.editcustomer.name;
 
 
       final entity = CustomerCompanion(
+        Id: drift.Value(widget.Id),
         name: drift.Value(_nameController.text.isNotEmpty ? _nameController.text : ''),
         type: drift.Value(_typeController.text.isNotEmpty ? _typeController.text : ''),
         status: drift.Value(_statusController.text.isNotEmpty ? _statusController.text : ''),

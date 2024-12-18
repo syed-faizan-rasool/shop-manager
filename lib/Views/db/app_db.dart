@@ -47,8 +47,9 @@ Future<int> insertCustomer (CustomerCompanion companion) async {
 return await into(customer).insert(companion);
 }
 
-Future<int> deleteCustomer (int id)async {
-return await (delete(customer)..where((tbl) => tbl.Id.equals(id))).go();
+Future<int> deleteCustomer(int Id) async {
+  return await (delete(customer)..where((tbl) => tbl.Id.equals(Id))).go();
 }
+
 
 }
