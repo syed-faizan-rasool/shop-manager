@@ -16,6 +16,7 @@ class AppColor {
   static const dashgrey = Color(0xFFEEF5F9);
   static const customorange = Color(0xFFFFB22B);
   
+  
 
 
 

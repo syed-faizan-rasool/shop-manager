@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shop_manager/Views/customerPage.dart';
+import 'package:shop_manager/Views/Customres/customerPage.dart';
 import 'package:shop_manager/res/components/card.dart';
-import 'package:shop_manager/res/constants/colors.dart';
+import 'package:shop_manager/res/commons/colors.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -94,21 +94,21 @@ final Map<String, List<String>> _subItems = {
 
 Widget _buildDrawer() {
   return Drawer(
-    shape:  RoundedRectangleBorder(
+    shape:  const RoundedRectangleBorder(
       borderRadius : BorderRadius.zero,
     ),
     backgroundColor: AppColor.white,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
+        SizedBox(
           height: 300,
           child: DrawerHeader(
             decoration: const BoxDecoration(
              
               
             ),
-            child: Container(
+            child: SizedBox(
              
               width: double.infinity, 
               child: Column(
@@ -240,7 +240,7 @@ Widget _buildExpandableDrawerItem(String title, List<String> subItems) {
           if (item == "Customers") {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) =>  CustomerScreen()),
+              MaterialPageRoute(builder: (context) =>  const CustomerScreen()),
             );
           } else {
             // Handle other items as needed
@@ -351,22 +351,22 @@ Widget _buildExpandableDrawerItem(String title, List<String> subItems) {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CustomCard(
+                customCard(
                   "Stock / Products",
                   ["Products List", "New Product", "Stock Report"],
                   [AppColor.dashzinc, AppColor.dashpurple, AppColor.dashzinc],
                 ),
-                CustomCard(
+                customCard(
                   "Sale",
                   ["New Invoice", "Customers List", "Receive Payment"],
                   [AppColor.dashpurple, AppColor.dashzinc, AppColor.dashzinc],
                 ),
-                CustomCard(
+                customCard(
                   "Purchase",
                   ["Create Purchase Invoice", "Suppliers List", "Paid Payment"],
                   [AppColor.dashpurple, AppColor.dashzinc, AppColor.dashzinc],
                 ),
-                CustomCard(
+                customCard(
                   "Expense and Payments",
                   ["New Expense", "Journal Entry", "New Payment"],
                   [AppColor.dashred, AppColor.dashzinc, AppColor.dashzinc],
@@ -429,7 +429,7 @@ Widget _buildExpandableDrawerItem(String title, List<String> subItems) {
                     ),
                   ),
                 ),
-                CustomCard(
+                customCard(
                   "Cash and Bank Accounts",
                   ["Cash\nRs 0", "Create Bank Account"],
                   [AppColor.dashgreen, AppColor.dashzinc],

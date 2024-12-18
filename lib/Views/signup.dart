@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shop_manager/Views/loginpage.dart';
-import 'package:shop_manager/res/constants/colors.dart';
+import 'package:shop_manager/res/commons/colors.dart';
 
 class SignupPage extends StatefulWidget {
-  const SignupPage({Key? key}) : super(key: key);
+  const SignupPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _SignupPageState createState() => _SignupPageState();
 }
 
@@ -415,7 +416,7 @@ class _SignupPageState extends State<SignupPage> {
                        Navigator.pop(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>  LoginPage()),
+                            builder: (context) =>  const LoginPage()),
                       );
                     },
                     child: Text(

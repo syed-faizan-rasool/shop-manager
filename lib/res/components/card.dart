@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart'; // Import Google Fonts
-import 'package:shop_manager/res/constants/colors.dart';
+import 'package:shop_manager/res/commons/colors.dart';
 
-Widget CustomCard(
+Widget customCard(
     String title, List<String> buttonTitles, List<Color> buttonColors) {
   return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
