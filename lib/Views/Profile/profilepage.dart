@@ -1,13 +1,19 @@
 import 'dart:io';
 
+import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shop_manager/Views/db/app_db.dart';
 import 'package:shop_manager/res/commons/colors.dart';
+import 'package:shop_manager/res/commons/fonts.dart';
+import 'package:shop_manager/res/components/customfields.dart';
 
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({Key? key}) : super(key: key);
+
+  
+  const ProfilePage({Key? key }) : super(key: key);
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -15,6 +21,14 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
 
+CustomFields customFields = CustomFields();
+ int currentStep = 0;
+ File? _profileImage;
+
+ Future<drift.Uint8List?> _convertImageToBytes(File? imageFile) async {
+  if (imageFile == null) return null;
+  return await imageFile.readAsBytes();
+}
 
  File? _imageFile;
   final picker = ImagePicker();
@@ -31,6 +45,18 @@ class _ProfilePageState extends State<ProfilePage> {
   String _headerAndLogo = 'on';
   String _urduLabel = 'off';
   String _smsNotification = 'on';
+
+  bool Variants = false;
+  bool SecondaryUnits = false;
+  bool SalesmanCommission = false;
+  bool AgentCommission = false;
+  bool NegativeStockselling = true;
+  bool BarcodeQRcode = false;
+  bool TaxOption = false;
+  bool LendInventory = false;
+
+
+
 
   Future<void> _pickImage() async {
     final pickedFile = await showModalBottomSheet(
@@ -98,42 +124,82 @@ class _ProfilePageState extends State<ProfilePage> {
   final TextEditingController _gstController = TextEditingController();
   final TextEditingController _vatController = TextEditingController();
 
+
+
   String? _selectedIndustry = "IT";
   String? _selectedBusinessType = "Retailer";
 
   final List<String> industries = ['Animal Health', 'Appliance', 'Automobile', 'Chemicals', 'Clothes', 'COnstruction', 'Cosmetics', 'Electronics', 'Food', 'Garments', 'General Store', 'Grocery', 'Handicraft', 'Hardware', 'Health', 'Interior', 'IT', 'Jewellary', 'Medical', 'Mobiles', 'Paper', 'Petroleum', 'Shoes', 'Skin Care', 'Sports', 'Stationary', 'Textile', 'Tyres', 'Vegetables', 'Pesticides', 'Others'];
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[200],
-      appBar: AppBar(
-        title: const Text("Edit Profile"),
-        backgroundColor: Colors.teal,
-        centerTitle: true,
+
+
+
+  late AppDb _db;
+
+
+@override
+   void initState() {
+    super.initState();
+       _db = AppDb();
+  _fetchProfileData();
+ 
+  }
+void _fetchProfileData() async {
+  final profiles = await _db.getProfiles(); // Fetch all profiles from the database
+print(profiles);
+  if (profiles.isNotEmpty) {
+    final profile = profiles.first; // Get the first profile if it exists
+    setState(() {
+//Id = profile.id;
+      _businessNameController.text = profile.businessName ;
+      _shopAddressController.text = profile.shopAddress;
+      _cityController.text = profile.city ;
+      _stateController.text = profile.state ;
+      _countryController.text = profile.country ;
+      _emailController.text = profile.email ;
+      _selectedIndustry = profile.industry ;
+      _selectedBusinessType = profile.businessType ;
+      _currencyController.text = profile.currency ;
+      //_smsNotification = profile.smsNotification as String ?? '';
+      _gstController.text = profile.gst ;
+      _vatController.text = profile.vat ;
+      _headerNoteController.text = profile.headerNote ;
+      _footerNoteController.text = profile.footerNote ;
+     // _selectedTemplate = profile.template ?? 'A4';
+      Variants = profile.variants;
+      SecondaryUnits = profile.secondaryUnits;
+      SalesmanCommission = profile.salesmanCommission;
+      AgentCommission = profile.agentCommission;
+      NegativeStockselling = profile.negativeStockSelling;
+      BarcodeQRcode = profile.barcode;
+      TaxOption = profile.taxOption;
+      LendInventory = profile.lendInventory;
+    });
+  } else {
+    // If no profiles exist, you can either show a message or leave fields empty
+    print("No profiles found in the database.");
+  }
+}
+
+
+List<Step> getSteps() => [
+   Step(
+    isActive: currentStep >= 0,
+//     title: 
+    
+    
+// ),
+
+   title: const SizedBox.shrink(),
+  label: Column(
+        children: [
+        
+
+         Text('Basic Info', style: AppTextStyles.black(fontSize: 12 , ) ),
+  
+        ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              height: 70,
-              color:AppColor.white,
-              child: const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Profile",style: TextStyle(fontSize: 21),),
-                    Text("Home",style: TextStyle(fontSize: 16,color: AppColor.customblue),),
-                  ],
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                   Padding(
+    content:  Padding(
                padding: const EdgeInsets.all(4.0),
                child: Container(
                decoration: BoxDecoration(
@@ -154,17 +220,17 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       const SizedBox(height: 10),
                   
-                      _buildTextField("Business Name", _businessNameController),
+                      customFields.buildTextField("Business Name", _businessNameController),
                   
-                      _buildTextField("Shop Address", _shopAddressController),
+                      customFields.buildTextField("Shop Address", _shopAddressController),
+                
+                      customFields.buildTextField("City", _cityController),
                   
-                      _buildTextField("City", _cityController),
+                      customFields.buildTextField("State/Province", _stateController),
                   
-                      _buildTextField("State/Province", _stateController),
+                      customFields.buildTextField("Country", _countryController),
                   
-                      _buildTextField("Country", _countryController),
-                  
-                      _buildTextField("Email Address", _emailController),
+                      customFields.buildTextField("Email Address", _emailController),
                   
                     
                   
@@ -172,17 +238,11 @@ class _ProfilePageState extends State<ProfilePage> {
                     value: _selectedIndustry,
                     hint: Text(
                       'Select Industry',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        color: AppColor.customgrey,
-                      ),
+                      style: AppTextStyles.grey(fontSize: 16),
                     ),
                     decoration: InputDecoration(
                       labelText: 'Industry',
-                      labelStyle: GoogleFonts.poppins(
-                        fontSize: 14,
-                        color: Colors.black,
-                      ),
+                      labelStyle: AppTextStyles.black(  fontSize: 14),
                       focusedBorder: const OutlineInputBorder(
                         borderSide: BorderSide(color: AppColor.customgrey, width: 2),
                       ),
@@ -198,11 +258,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         value: industry,
                         child: Text(
                           industry,
-                          style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  color: AppColor.customgrey,
-                  fontWeight: FontWeight.w400,
-                          ),
+                          style: AppTextStyles.grey(  fontSize: 16),
                         ),
                       );
                     }).toList(),
@@ -225,21 +281,29 @@ class _ProfilePageState extends State<ProfilePage> {
                       const Text("Business Type"),
                       Column(
                         children: [
-                          _buildRadioButton("Wholesaller"),
-                          _buildRadioButton("Distributor"),
-                          _buildRadioButton("Retailer"),
-                          _buildRadioButton("Manufacturer"),
+                          customFields.buildRadioButton("Wholesaller"),
+                          customFields.buildRadioButton("Distributor"),
+                          customFields.buildRadioButton("Retailer"),
+                          customFields.buildRadioButton("Manufacturer"),
                         ],
                       ),
                   
                       // Currency
-                      _buildTextField("Currency", _currencyController),
+                      customFields.buildTextField("Currency", _currencyController),
                      ],
                    ),
-               ),),
-              
-            
-             Padding(
+               ),),  ),
+     Step(
+      isActive: currentStep >= 1,
+        title: const SizedBox.shrink(),
+      label: Column(
+        children: [
+        
+           Text('Config Features', style: GoogleFonts.poppins(color: AppColor.black ,fontSize: 11),),
+        ],
+      ),
+   // title:
+    content:  Padding(
                padding: const EdgeInsets.all(8.0),
                child: Container(
                decoration: BoxDecoration(
@@ -262,22 +326,22 @@ class _ProfilePageState extends State<ProfilePage> {
                 const SizedBox(height: 10),
                  
 
-                _buildFeatureRow("Variants"),
-                _buildFeatureRow("Secondary Units"),
-                _buildFeatureRow("Salesman Commission"),
-                _buildFeatureRow("Agent Commission"),
-                _buildFeatureRow("Negative Stock selling"),
-                _buildFeatureRow("Barcode / QR code"),
-                _buildFeatureRow("Tax option"),
-                _buildFeatureRow("Lend Inventory"),
+                customFields.buildFeatureRow("Variants"),
+                customFields.buildFeatureRow("Secondary Units"),
+                customFields.buildFeatureRow("Salesman Commission"),
+                customFields.buildFeatureRow("Agent Commission"),
+                customFields.buildFeatureRow("Negative Stock selling"),
+                customFields.buildFeatureRow("Barcode / QR code"),
+                customFields.buildFeatureRow("Tax option"),
+                customFields.buildFeatureRow("Lend Inventory"),
                  
                 const SizedBox(height: 20),
                  
-                _buildTextField("GST (General Sales Tax)", _gstController),
+                customFields.buildTextField("GST (General Sales Tax)", _gstController),
                    
                     const SizedBox(width: 10),
                  
-                _buildTextField("VAT (Value Added Tax)", _vatController),
+                customFields.buildTextField("VAT (Value Added Tax)", _vatController),
                     
                  
                  
@@ -285,14 +349,19 @@ class _ProfilePageState extends State<ProfilePage> {
                     ],
                   ),
                ),
-             ),
-            
-            
-            
-            
-            
-            
-               Padding(
+             ), 
+     ),
+     Step(
+      isActive: currentStep >= 2,
+      title: const SizedBox.shrink(),
+      label: Column(
+        children: [
+        
+           Text('Invoice Setting', style: GoogleFonts.poppins(color: AppColor.black ,fontSize: 11) ,),
+        ],
+      ),
+   // title:
+    content: Padding(
                padding: const EdgeInsets.all(8.0),
                child: Container(
                decoration: BoxDecoration(
@@ -334,10 +403,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 const SizedBox(height: 20),
             
-                _buildTextArea("Print Header Note", _headerNoteController),
+                customFields.buildTextArea("Print Header Note", _headerNoteController),
             
 
-                _buildTextArea("Print Footer Note", _footerNoteController),
+                customFields.buildTextArea("Print Footer Note", _footerNoteController),
             
 
                 const Text(
@@ -363,15 +432,15 @@ class _ProfilePageState extends State<ProfilePage> {
                 const SizedBox(height: 20),
             
                 // Radio Buttons Section
-                _buildRadioOption(
+                customFields.buildRadioOption(
                     "Print Header and Logo", _headerAndLogo, (value) {
                   setState(() => _headerAndLogo = value);
                 }),
-                _buildRadioOption("Print Urdu label", _urduLabel,
+                customFields.buildRadioOption("Print Urdu label", _urduLabel,
                     (value) {
                   setState(() => _urduLabel = value);
                 }),
-                _buildRadioOption(
+                customFields.buildRadioOption(
                     "Send SMS Notification", _smsNotification, (value) {
                   setState(() => _smsNotification = value);
                 }),
@@ -379,11 +448,18 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             ),
              ),
-            
-            
-            
-            
-                 Padding(
+     ),
+     Step(
+      isActive: currentStep >= 3,
+       title: const SizedBox.shrink(),
+      label: Column(
+        children: [
+         
+         Text('Account Info', style: GoogleFonts.poppins(color: AppColor.black ,fontSize: 11) ,),
+        ],
+      ),
+    //title: Text('Account\n   Info', style: GoogleFonts.poppins(color: AppColor.black ,fontSize: 13) ,),
+    content:Padding(
                padding: const EdgeInsets.all(8.0),
                child: Container(
                decoration: BoxDecoration(
@@ -445,175 +521,232 @@ class _ProfilePageState extends State<ProfilePage> {
             
                 // Buttons Section
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                      ),
-                      onPressed: () {
-                        // Cancel button action
-                      },
-                      child: const Text("Cancel"),
-                    ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                      ),
-                      onPressed: () {
-                        // Save and Next button action
-                      },
-                      child: const Text("Save and Next"),
-                    ),
+                    // ElevatedButton(
+                    //   style: ElevatedButton.styleFrom(
+                    //     backgroundColor: Colors.red,
+                    //   ),
+                    //   onPressed: () {
+                    //     // Cancel button action
+                    //   },
+                    //   child: const Text("Cancel"),
+                    // ),
+                   ElevatedButton(
+   style: ElevatedButton.styleFrom(
+                    // Transparent background
+minimumSize: Size(100, 40),
+                backgroundColor:  AppColor.dashappbar,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+              ),
+  onPressed: () async {
+
+ print("Name: ${_businessNameController.text}");
+      print("Address: ${_shopAddressController.text}");
+      print("City: ${_cityController.text}");
+      print("state: ${_stateController.text}");
+      print("country: ${_countryController.text}");
+      print("email: ${_emailController.text}");
+      print("City: ${_cityController.text}");
+      print("industry: ${_selectedIndustry ?? ""}");
+      print("businessType: ${_selectedBusinessType ?? ""}");
+      print("currency: ${_currencyController.text}");
+      print("smsNotification: ${_smsNotification}");
+
+  try {
+    // Create the ProfileCompanion entity with the form data
+    final entity = ProfileCompanion(
+      businessName: drift.Value(_businessNameController.text),
+      shopAddress: drift.Value(_shopAddressController.text),
+      city: drift.Value(_cityController.text),
+      state: drift.Value(_stateController.text),
+      country: drift.Value(_countryController.text),
+      email: drift.Value(_emailController.text),
+      industry: drift.Value(_selectedIndustry ?? ""),
+      businessType: drift.Value(_selectedBusinessType ?? ""),
+      currency: drift.Value(_currencyController.text),
+      smsNotification: const drift.Value(false), // Default to false
+      gst: drift.Value(_gstController.text),
+      vat: drift.Value(_vatController.text),
+      headerNote: drift.Value(_headerNoteController.text),
+      footerNote: drift.Value(_footerNoteController.text),
+      variants: const drift.Value(false), 
+      secondaryUnits: const drift.Value(false),
+      salesmanCommission: const drift.Value(false),
+      agentCommission: const drift.Value(false),
+      negativeStockSelling: const drift.Value(true),
+      barcode: const drift.Value(false),
+      taxOption: const drift.Value(false),
+      lendInventory: const drift.Value(false),
+      printTemplate: drift.Value(_selectedTemplate),
+      printHeaderLogo: const drift.Value(false), 
+      printUrduLabel: const drift.Value(false),
+      username: const drift.Value("default_user"), 
+      accountType: const drift.Value("default_account"), 
+
+      
+      //image: profileImageBytes != null ? drift.Value(profileImageBytes) : const drift.Value.absent(),
+    );
+
+    
+    final result = await _db.updateProfile(entity);
+
+   
+    if (result) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Profile updated successfully!")),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Failed to update profile")),
+      );
+    }
+
+
+    _fetchProfileData();
+    setState(() {});
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Error: $e")),
+    );
+  }
+},
+
+              child:  Text("Save" , style: GoogleFonts.poppins(color: AppColor.white ,fontSize: 16),),
+
+)
+
+
                   ],
                 ),
               ],
             ),
              ),
-             ),
-            
-            
-            
-            
-                ],
-              ),
-            
-            ),
-             Container(
-              height: 70,
-              color:AppColor.white,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child:  Text(
-                      "Copyright 2017-2024 Roznamcha App Pvt LTD",
-                      style: GoogleFonts.poppins(
-                        fontSize: 15,
-                        color: AppColor.customgrey,
-                      ),
-                    ),
-              ),
+             ),  ),
+];
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[200],
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            InkWell(
+             onTap:  () => Navigator.pop(context),
+              child: const Icon(Icons.arrow_back, color: AppColor.white)),
+            const SizedBox(width: 20),
+            Text(
+              "Customers",
+              style: GoogleFonts.poppins(fontSize: 21, color: AppColor.white),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildTextField(String label, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: TextField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: label,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
+        backgroundColor: AppColor.dashappbar,
+        actions: const [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.home, color: AppColor.white, size: 17),
+              SizedBox(width: 12),
+              Icon(Icons.language, color: AppColor.white, size: 17),
+              SizedBox(width: 12),
+              Icon(Icons.refresh_outlined, color: AppColor.white, size: 17),
+              SizedBox(width: 12),
+              Icon(Icons.person, color: AppColor.white, size: 17),
+              SizedBox(width: 12),
+            ],
           ),
-        ),
+        ],
       ),
-    );
-  }
+      body:
+   
+         Stepper(
+   
+        type: StepperType.horizontal,
 
-  Widget _buildRadioButton(String title) {
-    return RadioListTile<String>(
-      title: Text(title),
-      value: title,
-      groupValue: _selectedBusinessType,
-      onChanged: (String? value) {
-        setState(() {
-          _selectedBusinessType = value;
-        });
-      },
-      dense: true,
-    );
-  }
-
-  Widget _buildFeatureRow(String featureName) {
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            featureName,
-            style: const TextStyle(fontSize: 16),
-          ),
-        ),
-        Row(
-          children: [
-            Radio<String>(
-              value: "on",
-              groupValue: _featureSelection[featureName],
-              onChanged: (value) {
-                setState(() {
-                  _featureSelection[featureName] = value!;
-                });
-              },
-            ),
-            const Text("On"),
-            Radio<String>(
-              value: "off",
-              groupValue: _featureSelection[featureName],
-              onChanged: (value) {
-                setState(() {
-                  _featureSelection[featureName] = value!;
-                });
-              },
-            ),
-            const Text("Off"),
-          ],
-        ),
-      ],
-    );
-  }
-
-
- Widget _buildRadioOption(String title, String groupValue, Function(String) onChanged) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(title, style: const TextStyle(fontSize: 16)),
-        const SizedBox(width: 10),
-        Row(
-          children: [
-            Radio<String>(
-              value: "on",
-              groupValue: groupValue,
-              onChanged: (value) => onChanged(value!),
+        steps: getSteps(),
+        currentStep: currentStep,
+                    onStepTapped: (index) {
+              setState(() {
+                currentStep = index;
+              });
+            },
+        onStepContinue: () {
+          final isLastStep = currentStep == getSteps().length - 1;
+          if(isLastStep){
+print("Completed");
+          }
+          else{
+          setState(() {
            
-        ),
-        const Text("On"),
-        Radio<String>(
-          value: "off",
-          groupValue: groupValue,
-          onChanged: (value) => onChanged(value!),
-        ),
-        const Text("Off"),
-     
-          ],
-              ),
-      ],
-    );
-  }
+              currentStep += 1;
+            }
+          );
+          }
+        },
+         onStepCancel: () {
+          currentStep==0 ? null :
+                    setState(() {
+           
+              currentStep -= 1;
+            }
+          );
+        },
+              controlsBuilder: (BuildContext context, ControlsDetails details) {
+        return Column(
 
-  Widget _buildTextArea(String label, TextEditingController controller) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 5),
-        Container(
-          height: 100,
-          child: TextField(
-            controller: controller,
-            maxLines: 5,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: "Enter your note here...",
+          children: [
+            SizedBox(height: 10,),
+                        Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                
+                // Cancel Button
+                ElevatedButton(
+                  onPressed: details.onStepCancel,
+                  style: ElevatedButton.styleFrom(
+                        // Transparent background
+            minimumSize: Size(170, 50),
+              shadowColor: Colors.transparent,    // Removes the button shadow
+                elevation: 0,
+                    backgroundColor:  currentStep == 0 ?  Colors.grey[200] : AppColor.dashred,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  child:  currentStep == 0
+                      ? const Text("")
+                  : Text("Previous" , style: AppTextStyles.white(  fontSize: 16),),
+                ),
+                // Continue Button
+                ElevatedButton(
+                  onPressed: details.onStepContinue,
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(170, 50),
+                        shadowColor: Colors.transparent,    // Removes the button shadow
+                elevation: 0, 
+                    backgroundColor: currentStep == getSteps().length - 1 ?  Colors.grey[200] : AppColor.dashappbar,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  child: currentStep == getSteps().length - 1
+                      ? const Text("")
+                  :  Text("Next"  , style: AppTextStyles.white()),
+                  
+                ),
+              ],
             ),
-          ),
+          ],
+        );
+      },
         ),
-        const SizedBox(height: 10),
-      ],
-    );
+     );
+
   }
 
 
